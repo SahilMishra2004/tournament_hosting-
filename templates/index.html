@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to Tournament App</h1>
+    <p class="lead">Create and manage your tournaments with ease</p>
+    <hr class="my-4">
+    {% if 'user_id' not in session %}
+        <p>Get started by creating an account or logging in</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}" role="button">Register</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('login') }}" role="button">Login</a>
+    {% else %}
+        <p>Manage your tournaments or create a new one</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">Dashboard</a>
+        <a class="btn btn-success btn-lg" href="{{ url_for('create_tournament') }}" role="button">Create Tournament</a>
+    {% endif %}
+</div>
+{% endblock %}

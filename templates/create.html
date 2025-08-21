@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Create Tournament{% endblock %}
+
+{% block content %}
+<h2>Create New Tournament</h2>
+<form method="POST" action="{{ url_for('create_tournament') }}">
+    <div class="mb-3">
+        <label for="name" class="form-label">Tournament Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    
+    <div class="mb-3">
+        <label for="mode" class="form-label">Game Mode</label>
+        <select class="form-select" id="mode" name="mode" required>
+            <option value="" selected disabled>Select a mode</option>
+            <option value="single_elimination">Single Elimination</option>
+            <option value="double_elimination">Double Elimination</option>
+            <option value="round_robin">Round Robin</option>
+        </select>
+    </div>
+    
+    <!-- Rest of the form remains the same -->
+    <div class="mb-3">
+        <label class="form-label">Teams</label>
+        <div id="teams-container">
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" name="team_name" placeholder="Team name" required>
+                <button class="btn btn-outline-danger" type="button" onclick="removeTeam(this)">Remove</button>
+            </div>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" name="team_name" placeholder="Team name" required>
+                <button class="btn btn-outline-danger" type="button" onclick="removeTeam(this)">Remove</button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary mt-2" onclick="addTeam()">Add Team</button>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Create Tournament</button>
+</form>
+
+<!-- Mode descriptions card -->
+<div class="mb-3">
+    <div class="card">
+        <div class="card-body">
+            <h6 class="card-title">Mode Descriptions</h6>
+            <ul class="list-unstyled">
+                <li><strong>Single Elimination:</strong> Lose once and you're out</li>
+                <li><strong>Double Elimination:</strong> Lose twice before you're out</li>
+                <li><strong>Round Robin:</strong> Every team plays every other team</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addTeam() {
+        const container = document.getElementById('teams-container');
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2';
+        div.innerHTML = `
+            <input type="text" class="form-control" name="team_name" placeholder="Team name" required>
+            <button class="btn btn-outline-danger" type="button" onclick="removeTeam(this)">Remove</button>
+        `;
+        container.appendChild(div);
+    }
+    
+    function removeTeam(button) {
+        if (document.querySelectorAll('#teams-container .input-group').length > 2) {
+            button.parentElement.remove();
+        } else {
+            alert('You need at least 2 teams');
+        }
+    }
+</script>
+{% endblock %}

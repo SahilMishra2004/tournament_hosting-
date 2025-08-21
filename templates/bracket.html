@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tournament.name }} Bracket{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ tournament.name }}</h2>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <strong>Mode:</strong> {{ tournament.mode.replace('_', ' ').title() }}
+                </div>
+                <div>
+                    <strong>Teams:</strong> {{ teams|length }}
+                </div>
+                <div>
+                    <strong>Created:</strong> {{ tournament.created_at.strftime('%Y-%m-%d') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if tournament.mode == 'round_robin' %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Team</th>
+                        <th>Wins</th>
+                        <th>Losses</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                        <tr>
+                            <td>{{ team.name }}</td>
+                            <td>{{ team.matches_won|length }}</td>
+                            <td>{{ team.matches_as_team1|length + team.matches_as_team2|length - team.matches_won|length }}</td>
+                            <td>{{ team.matches_won|length * 3 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h4 class="mt-4">Matches</h4>
+        <div class="row">
+            {% for match in matches %}
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">Match {{ match.id }}</h5>
+                                {% if match.winner_id %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </div>
+                            <div class="match-team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                                {{ match.team1.name }}
+                                {% if not match.winner_id %}
+                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team1_id) }}" 
+                                       class="btn btn-sm btn-success float-end">Win</a>
+                                {% endif %}
+                            </div>
+                            <div class="text-center my-1">vs</div>
+                            <div class="match-team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                                {{ match.team2.name }}
+                                {% if not match.winner_id %}
+                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team2_id) }}" 
+                                       class="btn btn-sm btn-success float-end">Win</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="bracket-wrapper">
+            {% if tournament.mode == 'double_elimination' %}
+                <div class="bracket-section">
+                    <h4 class="bracket-title">Winners Bracket</h4>
+                    {% for round_num in range(1, max_round + 1) %}
+                        {% set round_matches = matches|selectattr('round_number', 'equalto', round_num)|selectattr('bracket_type', 'equalto', 'winners')|list %}
+                        {% if round_matches %}
+                            <div class="bracket-round">
+                                <div class="round-header">Round {{ round_num }}</div>
+                                {% for match in round_matches %}
+                                    <div class="match {% if match.winner_id %}completed{% endif %}">
+                                        <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                                            {% if match.team1_id %}
+                                                {{ match.team1.name }}
+                                                {% if not match.winner_id %}
+                                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team1_id) }}" 
+                                                       class="btn btn-sm btn-success">Win</a>
+                                                {% endif %}
+                                            {% else %}
+                                                TBD
+                                            {% endif %}
+                                        </div>
+                                        <div class="team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                                            {% if match.team2_id %}
+                                                {{ match.team2.name }}
+                                                {% if not match.winner_id %}
+                                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team2_id) }}" 
+                                                       class="btn btn-sm btn-success">Win</a>
+                                                {% endif %}
+                                            {% else %}
+                                                TBD
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="bracket-section">
+                    <h4 class="bracket-title">Losers Bracket</h4>
+                    {% for round_num in range(1, max_round * 2) %}
+                        {% set round_matches = matches|selectattr('bracket_type', 'equalto', 'losers')|selectattr('round_number', 'equalto', round_num)|list %}
+                        {% if round_matches %}
+                            <div class="bracket-round">
+                                <div class="round-header">Round {{ round_num }}</div>
+                                {% for match in round_matches %}
+                                    <div class="match {% if match.winner_id %}completed{% endif %}">
+                                        <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                                            {% if match.team1_id %}
+                                                {{ match.team1.name }}
+                                                {% if not match.winner_id %}
+                                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team1_id) }}" 
+                                                       class="btn btn-sm btn-success">Win</a>
+                                                {% endif %}
+                                            {% else %}
+                                                TBD
+                                            {% endif %}
+                                        </div>
+                                        <div class="team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                                            {% if match.team2_id %}
+                                                {{ match.team2.name }}
+                                                {% if not match.winner_id %}
+                                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team2_id) }}" 
+                                                       class="btn btn-sm btn-success">Win</a>
+                                                {% endif %}
+                                            {% else %}
+                                                TBD
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% set grand_finals = matches|selectattr('bracket_type', 'equalto', 'grand_finals')|list %}
+                {% if grand_finals %}
+                    <div class="bracket-section">
+                        <h4 class="bracket-title">Grand Finals</h4>
+                        {% for match in grand_finals %}
+                            <div class="match {% if match.winner_id %}completed{% endif %}">
+                                <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                                    {{ match.team1.name }}
+                                    {% if not match.winner_id %}
+                                        <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team1_id) }}" 
+                                           class="btn btn-sm btn-success">Win</a>
+                                    {% endif %}
+                                </div>
+                                <div class="team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                                    {{ match.team2.name }}
+                                    {% if not match.winner_id %}
+                                        <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team2_id) }}" 
+                                           class="btn btn-sm btn-success">Win</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+            {% else %}  <!-- Single Elimination -->
+                <div class="single-elimination-bracket">
+                    {% for round_num in range(1, max_round + 1) %}
+                        {% set round_matches = matches|selectattr('round_number', 'equalto', round_num)|list %}
+                        {% if round_matches %}
+                            <div class="bracket-round">
+                                <div class="round-header">Round {{ round_num }}</div>
+                                {% for match in round_matches %}
+                                    <div class="match {% if match.winner_id %}completed{% endif %}">
+                                        <div class="team {% if match.winner_id == match.team1_id %}winner{% endif %}">
+                                            {% if match.team1_id %}
+                                                {{ match.team1.name }}
+                                                {% if not match.winner_id %}
+                                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team1_id) }}" 
+                                                       class="btn btn-sm btn-success">Win</a>
+                                                {% endif %}
+                                            {% else %}
+                                                TBD
+                                            {% endif %}
+                                        </div>
+                                        <div class="team {% if match.winner_id == match.team2_id %}winner{% endif %}">
+                                            {% if match.team2_id %}
+                                                {{ match.team2.name }}
+                                                {% if not match.winner_id %}
+                                                    <a href="{{ url_for('set_winner', match_id=match.id, team_id=match.team2_id) }}" 
+                                                       class="btn btn-sm btn-success">Win</a>
+                                                {% endif %}
+                                            {% else %}
+                                                TBD
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

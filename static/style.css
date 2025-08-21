@@ -1,0 +1,155 @@
+/* General Styles */
+body {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Bracket Styles */
+.bracket-wrapper {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px 0;
+    gap: 30px;
+}
+
+.bracket-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    min-width: 250px;
+}
+
+.single-elimination-bracket {
+    display: flex;
+    gap: 30px;
+}
+
+.bracket-round {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.round-header {
+    background-color: #343a40;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.match {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    min-width: 200px;
+}
+
+.match.completed {
+    background-color: #f8f9fa;
+}
+
+.match:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.team {
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.team.winner {
+    background-color: #d4edda;
+    font-weight: bold;
+    color: #155724;
+}
+
+/* Connector lines for single elimination */
+.single-elimination-bracket .bracket-round:not(:last-child) .match::after {
+    content: "";
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    width: 15px;
+    height: 2px;
+    background: #6c757d;
+}
+
+.single-elimination-bracket .bracket-round:not(:first-child) .match::before {
+    content: "";
+    position: absolute;
+    left: -15px;
+    width: 15px;
+    height: 2px;
+    background: #6c757d;
+}
+
+.single-elimination-bracket .bracket-round:nth-child(n+2) .match::before {
+    top: 50%;
+}
+
+/* Double elimination specific styles */
+.bracket-section:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    width: 15px;
+    height: 2px;
+    background: #6c757d;
+}
+
+/* Round robin styles */
+.table th {
+    background-color: #343a40;
+    color: white;
+}
+
+.match-team {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    background-color: #f8f9fa;
+}
+
+.match-team.winner {
+    background-color: #d4edda;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bracket-wrapper, .single-elimination-bracket {
+        flex-direction: column;
+    }
+    
+    .bracket-round {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .match {
+        min-width: 180px;
+        margin-right: 15px;
+    }
+}
